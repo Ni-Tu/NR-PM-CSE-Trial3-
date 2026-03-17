@@ -1,0 +1,74 @@
+type: http
+name: Get claim details
+url: '{{baseUrl}}/claims/:claimId'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+pathVariables:
+  - key: claimId
+    value: string
+scripts:
+  - type: afterResponse
+    code:
+      - // [Smoke] Auto-generated test assertions
+      - pm.test('Status code is successful (2xx)', function () {
+      - '    pm.response.to.be.success;'
+      - '});'
+      - pm.test('Response time is acceptable', function () {
+      - '    var threshold = parseInt(pm.environment.get(''RESPONSE_TIME_THRESHOLD'') || ''2000'', 10);'
+      - '    pm.expect(pm.response.responseTime).to.be.below(threshold);'
+      - '});'
+      - pm.test('Response body is not empty', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        var body = pm.response.text();'
+      - '        pm.expect(body.length).to.be.above(0);'
+      - '    }'
+      - '});'
+    language: text/javascript
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "id": "string",
+            "policyId": "string",
+            "lineOfBusiness": "string",
+            "status": "under_investigation",
+            "incidentDate": "1969-07-04",
+            "description": "string",
+            "estimatedDamage": 5559.4928930636825,
+            "filedAt": "2014-04-27T15:12:14.627Z",
+            "updatedAt": "2006-01-03T03:41:36.210Z",
+            "assignedAdjuster": "string",
+            "adjudication": {
+              "claimId": "string",
+              "decision": "string",
+              "approvedAmount": 3240.9473551131728,
+              "adjudicatedAt": "1988-06-08T06:39:45.753Z",
+              "adjusterNotes": "string"
+            },
+            "settlement": {
+              "claimId": "string",
+              "amount": 6756.567041992871,
+              "paymentMethod": "string",
+              "status": "processing",
+              "initiatedAt": "1962-03-06T06:36:17.905Z",
+              "completedAt": "2007-05-29T14:06:09.359Z",
+              "referenceNumber": "string"
+            }
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: Claim details
+  - response:
+      statusCode: 404
+      statusText: Not Found
+      body:
+        type: text
+        content: ''
+    name: Claim not found

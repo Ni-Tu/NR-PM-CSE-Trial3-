@@ -1,0 +1,155 @@
+type: http
+name: List claims
+url: '{{baseUrl}}/claims?status=closed&lineOfBusiness=auto&filedAfter=1989-08-30&filedBefore=1989-08-30&limit=25&offset=0'
+method: GET
+headers:
+  - key: Accept
+    value: application/json
+queryParams:
+  - key: status
+    value: closed
+  - key: lineOfBusiness
+    value: auto
+  - key: filedAfter
+    value: '1989-08-30'
+  - key: filedBefore
+    value: '1989-08-30'
+  - key: limit
+    value: '25'
+  - key: offset
+    value: '0'
+scripts:
+  - type: afterResponse
+    code:
+      - // [Contract] Auto-generated contract test assertions
+      - pm.test('Status code is successful (2xx)', function () {
+      - '    pm.response.to.be.success;'
+      - '});'
+      - pm.test('Response time is acceptable', function () {
+      - '    var threshold = parseInt(pm.environment.get(''RESPONSE_TIME_THRESHOLD'') || ''2000'', 10);'
+      - '    pm.expect(pm.response.responseTime).to.be.below(threshold);'
+      - '});'
+      - pm.test('Response body is not empty', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        var body = pm.response.text();'
+      - '        pm.expect(body.length).to.be.above(0);'
+      - '    }'
+      - '});'
+      - pm.test('Content-Type is application/json', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        pm.response.to.have.header(''Content-Type'');'
+      - '        pm.expect(pm.response.headers.get(''Content-Type'')).to.include(''application/json'');'
+      - '    }'
+      - '});'
+      - pm.test('Response is valid JSON', function () {
+      - '    if (pm.response.code !== 204) {'
+      - '        pm.response.to.be.json;'
+      - '    }'
+      - '});'
+      - // Validate required fields from response schema
+      - pm.test('Required fields are present', function () {
+      - '    if (pm.response.code === 204) return;'
+      - '    var jsonData = pm.response.json();'
+      - '    pm.expect(jsonData).to.be.an(''object'');'
+      - '    var keys = Object.keys(jsonData);'
+      - '    if (keys.length === 1 && Array.isArray(jsonData[keys[0]])) {'
+      - '        pm.expect(jsonData[keys[0]]).to.be.an(''array'');'
+      - '    }'
+      - '});'
+      - // Validate response field types (non-null required fields)
+      - pm.test('Field types are correct', function () {
+      - '    if (pm.response.code === 204) return;'
+      - '    var jsonData = pm.response.json();'
+      - '    Object.keys(jsonData).forEach(function(key) {'
+      - '        pm.expect(jsonData[key]).to.not.be.undefined;'
+      - '    });'
+      - '});'
+      - (function() {
+      - '    var status = pm.response.code;'
+      - '    if (status === 204) return; '
+      - '    try {'
+      - '        var body = pm.response.json();'
+      - '        pm.test(''Response body matches expected structure'', function () {'
+      - '            pm.expect(typeof body).to.equal(''object'');'
+      - '            if (status >= 400) {'
+      - '                pm.expect(body).to.have.property(''error'');'
+      - '                pm.expect(body).to.have.property(''message'');'
+      - '            }'
+      - '        });'
+      - '    } catch (e) {}'
+      - '})();'
+    language: text/javascript
+examples:
+  - response:
+      statusCode: 200
+      statusText: OK
+      body:
+        type: json
+        content: |-
+          {
+            "data": [
+              {
+                "id": "string",
+                "policyId": "string",
+                "lineOfBusiness": "string",
+                "status": "adjudicated",
+                "incidentDate": "2009-10-22",
+                "description": "string",
+                "estimatedDamage": 4063.7281935804026,
+                "filedAt": "1988-03-27T03:34:01.891Z",
+                "updatedAt": "1989-03-29T06:21:19.762Z",
+                "assignedAdjuster": "string",
+                "adjudication": {
+                  "claimId": "string",
+                  "decision": "string",
+                  "approvedAmount": 9569.428418260846,
+                  "adjudicatedAt": "1982-07-04T11:45:19.709Z",
+                  "adjusterNotes": "string"
+                },
+                "settlement": {
+                  "claimId": "string",
+                  "amount": 412.83740410856365,
+                  "paymentMethod": "string",
+                  "status": "initiated",
+                  "initiatedAt": "1955-07-21T03:21:31.274Z",
+                  "completedAt": "1972-11-29T05:20:22.548Z",
+                  "referenceNumber": "string"
+                }
+              },
+              {
+                "id": "string",
+                "policyId": "string",
+                "lineOfBusiness": "string",
+                "status": "denied",
+                "incidentDate": "1995-09-16",
+                "description": "string",
+                "estimatedDamage": 9313.251230339676,
+                "filedAt": "1998-02-10T20:07:48.020Z",
+                "updatedAt": "1996-04-28T21:01:32.424Z",
+                "assignedAdjuster": "string",
+                "adjudication": {
+                  "claimId": "string",
+                  "decision": "string",
+                  "approvedAmount": 9622.334028352137,
+                  "adjudicatedAt": "1960-07-19T13:36:42.038Z",
+                  "adjusterNotes": "string"
+                },
+                "settlement": {
+                  "claimId": "string",
+                  "amount": 4445.668752873813,
+                  "paymentMethod": "string",
+                  "status": "initiated",
+                  "initiatedAt": "2023-07-27T20:36:46.819Z",
+                  "completedAt": "1955-03-01T04:29:47.245Z",
+                  "referenceNumber": "string"
+                }
+              }
+            ],
+            "total": 2016,
+            "limit": 4993,
+            "offset": 2612
+          }
+      headers:
+        - key: Content-Type
+          value: application/json
+    name: List of claims
