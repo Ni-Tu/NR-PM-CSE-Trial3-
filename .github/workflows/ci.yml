@@ -1,1 +1,29 @@
-name: CI/CD Pipeline\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n  schedule:\n    - cron: "0 */6 * * *"\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Install Postman CLI\n        run: curl -o- "https://dl-cli.pstmn.io/install/unix.sh" | sh\n      - name: Login to Postman CLI\n        run: postman login --with-api-key \${{ secrets.POSTMAN_API_KEY }}\n      - name: Run Smoke Tests\n        run: postman collection run \${{ vars.POSTMAN_SMOKE_COLLECTION_UID }} -e \${{ vars.POSTMAN_ENVIRONMENT_UID }} --env-var baseUrl=\${{ vars.RUNTIME_BASE_URL || vars.DEV_GW_URL }} --report-events --env-var "\${{ vars.CI_ENVIRONMENT || 'Production' }}"\n      - name: Run Contract Tests\n        run: postman collection run \${{ vars.POSTMAN_CONTRACT_COLLECTION_UID }} -e \${{ vars.POSTMAN_ENVIRONMENT_UID }} --env-var baseUrl=\${{ vars.RUNTIME_BASE_URL || vars.DEV_GW_URL }} --report-events --env-var "\${{ vars.CI_ENVIRONMENT || 'Production' }}"\n
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Postman CLI
+        run: curl -o- "https://dl-cli.pstmn.io/install/unix.sh" | sh
+
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMANAPIKEYSECRET }}
+
+      - name: Run Smoke Tests
+        run: |
+          postman collection run ${{ vars.POSTMAN_SMOKE_COLLECTION_UID }} -e ${{ vars.POSTMAN_ENVIRONMENT_UID }} --env-var baseUrl=${{ vars.RUNTIME_BASE_URL || 'https://api.example.com' }} --report-events
+
+      - name: Run Contract Tests
+        run: |
+          postman collection run ${{ vars.POSTMAN_CONTRACT_COLLECTION_UID }} -e ${{ vars.POSTMAN_ENVIRONMENT_UID }} --env-var baseUrl=${{ vars.RUNTIME_BASE_URL || 'https://api.example.com' }} --report-events
