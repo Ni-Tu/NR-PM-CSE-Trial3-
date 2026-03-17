@@ -1,0 +1,29 @@
+name: Postman API onboarding
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  onboarding:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v4
+
+      - name: Run Postman onboarding (bootstrap + repo sync)
+        uses: postman-cs/postman-api-onboarding-action@v0
+        with:
+          project-name: claims-processing-api
+          domain: claims
+          domain-code: CL
+          spec-url: https://raw.githubusercontent.com/postman-cs/cse-exercise/main/specs/claims-processing-api-openapi.yaml
+          environments-json: '["prod"]'
+          env-runtime-urls-json: '{"prod":"https://api.example.com"}'
+          postman-api-key: ${{ secrets.POSTMANAPIKEYSECRET }}
+          postman-access-token: ${{ secrets.POSTMAN_ACCESS_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
